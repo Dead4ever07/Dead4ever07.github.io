@@ -28,7 +28,6 @@ export const PROJECTS = [
       'PCB drawn using Kicad 10.0',
       'The 230VAC interface uses a solid state relay to simplify the board'
     ],
-    liveUrl: 'https://github.com/Dead4ever07',
-    repoUrl: 'https://github.com/Dead4ever07'
+    repoUrl: 'https://github.com/Dead4ever07/ESP32-PLC'
   }
 ];

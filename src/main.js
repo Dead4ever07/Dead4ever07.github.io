@@ -22,7 +22,6 @@ const els = {
   hudTitle: document.getElementById('hud-title'),
   hudTagline: document.getElementById('hud-tagline'),
   hudStack: document.getElementById('hud-stack'),
-  hudLiveLink: document.getElementById('hud-live-link'),
   hudRepoLink: document.getElementById('hud-repo-link'),
   inspectBtn: document.getElementById('inspect-btn'),
   prevBtn: document.getElementById('prev-btn'),
@@ -40,7 +39,6 @@ const els = {
   inspectorSummary: document.getElementById('inspector-summary'),
   inspectorHighlights: document.getElementById('inspector-highlights'),
   inspectorStack: document.getElementById('inspector-stack'),
-  inspectorLiveLink: document.getElementById('inspector-live-link'),
   inspectorRepoLink: document.getElementById('inspector-repo-link'),
   closeInspectorBtn: document.getElementById('close-inspector-btn'),
 
@@ -174,7 +172,6 @@ function updateActiveUI() {
   els.hudTitle.textContent = project.title;
   els.hudTagline.textContent = project.tagline;
   renderStackChips(els.hudStack, project.stack);
-  els.hudLiveLink.href = project.liveUrl;
   els.hudRepoLink.href = project.repoUrl;
 
   els.inspectorIndex.textContent = idxText;
@@ -184,7 +181,6 @@ function updateActiveUI() {
   els.inspectorTagline.textContent = project.tagline;
   els.inspectorSummary.textContent = project.summary;
   renderStackChips(els.inspectorStack, project.stack);
-  els.inspectorLiveLink.href = project.liveUrl;
   els.inspectorRepoLink.href = project.repoUrl;
 
   els.inspectorHighlights.replaceChildren(
