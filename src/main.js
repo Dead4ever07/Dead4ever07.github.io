@@ -20,14 +20,12 @@ const els = {
   hudCategory: document.getElementById('hud-category'),
   hudYear: document.getElementById('hud-year'),
   hudTitle: document.getElementById('hud-title'),
-  hudTagline: document.getElementById('hud-tagline'),
-  hudStack: document.getElementById('hud-stack'),
   hudRepoLink: document.getElementById('hud-repo-link'),
   inspectBtn: document.getElementById('inspect-btn'),
   prevBtn: document.getElementById('prev-btn'),
   nextBtn: document.getElementById('next-btn'),
   dockDots: document.getElementById('dock-dots'),
-  filterPills: Array.from(document.querySelectorAll('.pill[data-filter]')),
+  filterPillsWrap: document.getElementById('filter-pills'),
   brandReset: document.getElementById('brand-reset'),
 
   inspector: document.getElementById('inspector'),
@@ -71,7 +69,6 @@ class FallbackStage {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'fallback-card-3d';
-      card.style.setProperty('--card-accent', project.accent || '#38bdf8');
       card.setAttribute('aria-label', `${project.title} (${project.category})`);
 
       const canvas = createProjectCardCanvas(project, idx, projects.length);
@@ -97,7 +94,7 @@ class FallbackStage {
     this.cards.forEach((card, idx) => {
       const offset = idx - index;
       const abs = Math.abs(offset);
-      const tx = offset * 280;
+      const tx = offset * 300;
       const tz = -abs * 140;
       const ry = -offset * 16;
       const scale = Math.max(0.72, 1 - abs * 0.14);
@@ -119,25 +116,31 @@ class FallbackStage {
   }
 }
 
-function hexToRgbTuple(hex) {
-  const clean = (hex || '#38bdf8').replace('#', '');
-  const num = parseInt(clean, 16);
-  return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
-}
-
-function setAccentTheme(hex) {
-  const root = document.documentElement.style;
-  root.setProperty('--accent', hex || '#38bdf8');
-  root.setProperty('--accent-rgb', hexToRgbTuple(hex));
-}
-
 function renderStackChips(container, stack) {
   container.replaceChildren(
-    ...stack.map((tech) => {
+    ...(stack || []).map((tech) => {
       const span = document.createElement('span');
       span.className = 'stack-chip';
       span.textContent = tech;
       return span;
+    })
+  );
+}
+
+function renderFilterPills() {
+  const categories = ['all', ...new Set(PROJECTS.map((p) => p.category).filter(Boolean))];
+  els.filterPillsWrap.replaceChildren(
+    ...categories.map((cat) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `pill${state.filter === cat ? ' is-active' : ''}`;
+      btn.dataset.filter = cat;
+      btn.textContent = cat === 'all' ? 'All' : cat;
+      btn.addEventListener('click', () => {
+        setInspecting(false);
+        applyFilter(cat);
+      });
+      return btn;
     })
   );
 }
@@ -148,7 +151,7 @@ function renderDockDots() {
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = `dock-dot${idx === state.activeIndex ? ' is-active' : ''}`;
-      dot.setAttribute('aria-label', `Jump to ${project.title}`);
+      dot.setAttribute('aria-label', `Rotate to ${project.title}`);
       dot.setAttribute('aria-selected', String(idx === state.activeIndex));
       dot.addEventListener('click', () => selectProject(idx));
       return dot;
@@ -160,31 +163,27 @@ function updateActiveUI() {
   const project = state.filtered[state.activeIndex];
   if (!project) return;
 
-  const idxText = `${String(state.activeIndex + 1).padStart(2, '0')} / ${String(
+  const idxText = `EXHIBIT ${String(state.activeIndex + 1).padStart(2, '0')} / ${String(
     state.filtered.length
   ).padStart(2, '0')}`;
-
-  setAccentTheme(project.accent);
 
   els.hudIndex.textContent = idxText;
   els.hudCategory.textContent = project.category;
   els.hudYear.textContent = project.year;
   els.hudTitle.textContent = project.title;
-  els.hudTagline.textContent = project.tagline;
-  renderStackChips(els.hudStack, project.stack);
   els.hudRepoLink.href = project.repoUrl;
 
   els.inspectorIndex.textContent = idxText;
   els.inspectorCategory.textContent = project.category;
   els.inspectorYear.textContent = project.year;
   els.inspectorTitle.textContent = project.title;
-  els.inspectorTagline.textContent = project.tagline;
-  els.inspectorSummary.textContent = project.summary;
+  els.inspectorTagline.textContent = project.tagline || '';
+  els.inspectorSummary.textContent = project.summary || '';
   renderStackChips(els.inspectorStack, project.stack);
   els.inspectorRepoLink.href = project.repoUrl;
 
   els.inspectorHighlights.replaceChildren(
-    ...project.highlights.map((item) => {
+    ...(project.highlights || []).map((item) => {
       const li = document.createElement('li');
       li.textContent = item;
       return li;
@@ -205,14 +204,13 @@ function renderGrid() {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'grid-item';
-      btn.style.setProperty('--item-accent', project.accent);
 
       const top = document.createElement('div');
       top.className = 'grid-item-top';
 
       const idxSpan = document.createElement('span');
       idxSpan.className = 'mono-tag';
-      idxSpan.textContent = `${String(globalIdx + 1).padStart(2, '0')} // ${project.year}`;
+      idxSpan.textContent = `EXH-${String(globalIdx + 1).padStart(2, '0')} // ${project.year}`;
 
       const catSpan = document.createElement('span');
       catSpan.className = 'category-chip';
@@ -224,7 +222,7 @@ function renderGrid() {
       h3.textContent = project.title;
 
       const p = document.createElement('p');
-      p.textContent = project.tagline;
+      p.textContent = project.tagline || project.summary || '';
 
       const stackWrap = document.createElement('div');
       stackWrap.className = 'stack-list';
@@ -277,7 +275,7 @@ function applyFilter(category) {
 
   state.activeIndex = 0;
 
-  for (const pill of els.filterPills) {
+  for (const pill of els.filterPillsWrap.querySelectorAll('.pill')) {
     pill.classList.toggle('is-active', pill.dataset.filter === category);
   }
 
@@ -322,11 +320,12 @@ async function mountThreeStage() {
 }
 
 function init() {
+  renderFilterPills();
   renderGrid();
   renderDockDots();
   updateActiveUI();
 
-  // Mount interactive 2.5D fallback stage immediately so cards are always visible
+  // Mount interactive 2.5D fallback stage immediately so exhibits are always visible
   activeStage = new FallbackStage(els.canvasContainer, {
     onSelectIndex: (idx) => selectProject(idx),
     onInspectIndex: (idx) => {
@@ -336,12 +335,11 @@ function init() {
   });
   activeStage.setProjects(state.filtered, state.activeIndex);
 
-  // Upgrade seamlessly to WebGL Three.js 3D stage
+  // Upgrade seamlessly to WebGL Three.js 3D Museum Room
   mountThreeStage().catch((err) => {
     console.warn('Three.js WebGL stage unavailable, using 2.5D stage:', err);
   });
 
-  // UI Listeners (always bound regardless of Three.js/WebGL status)
   els.prevBtn.addEventListener('click', () => selectProject(state.activeIndex - 1));
   els.nextBtn.addEventListener('click', () => selectProject(state.activeIndex + 1));
   els.inspectBtn.addEventListener('click', () => setInspecting(true));
@@ -359,13 +357,6 @@ function init() {
     setGridOpen(false);
     applyFilter('all');
   });
-
-  for (const pill of els.filterPills) {
-    pill.addEventListener('click', () => {
-      setInspecting(false);
-      applyFilter(pill.dataset.filter);
-    });
-  }
 
   let wheelLockUntil = 0;
   window.addEventListener(

@@ -29,5 +29,24 @@ export const PROJECTS = [
       'The 230VAC interface uses a solid state relay to simplify the board'
     ],
     repoUrl: 'https://github.com/Dead4ever07/ESP32-PLC'
-  }
+  },  {
+    id: 'plc-esp32-v1',
+    title: 'ESP32-S3 IoT PLC',
+    tagline: '',
+    category: 'Eletronics',
+    year: '2026',
+    accent: '#00A651',
+    stlUrl: './models/PCB.stl',
+    stlRotation: [0.2, 0, 0],
+    stlScale: 1.0,
+    stack: ['Eletronics', 'Kicad', 'IoT', 'ESP32'],
+    summary:
+      'An PLC board made arround a ESP32-S3 as a general purpose controler for IoT or automation.',
+    highlights: [
+      'Used ESP-IDF in the software running in the ESP32-S3',
+      'PCB drawn using Kicad 10.0',
+      'The 230VAC interface uses a solid state relay to simplify the board'
+    ],
+    repoUrl: 'https://github.com/Dead4ever07/ESP32-PLC'
+  },
 ];
