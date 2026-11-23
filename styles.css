@@ -267,6 +267,7 @@ kbd {
 .exhibit-pill-meta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.45rem;
   font-size: 0.72rem;
   color: var(--text-muted);
@@ -756,7 +757,9 @@ kbd {
 
   .exhibit-pill {
     order: 1;
+    width: min(560px, 100%);
     max-width: 100%;
+    justify-content: space-between;
   }
 }
 
@@ -766,9 +769,9 @@ kbd {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .topbar {
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.9rem;
   }
 
   .brand-tag,
@@ -778,12 +781,78 @@ kbd {
   }
 
   .hud {
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.9rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottom-bar {
+    gap: 0.5rem;
   }
 
   .exhibit-pill {
     width: 100%;
-    padding: 0.65rem 0.78rem;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    padding: 0.72rem 0.85rem;
+  }
+
+  .exhibit-pill-meta {
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    margin-bottom: 0.22rem;
+  }
+
+  .exhibit-title {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 1.04rem;
+  }
+
+  .exhibit-pill-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .exhibit-pill-actions .btn {
+    justify-content: center;
+    min-height: 40px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .dock {
+    padding: 0.32rem 0.45rem;
+  }
+
+  .nav-arrow {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .icon-btn {
+    padding: 0.42rem 0.62rem;
+    font-size: 0.75rem;
+  }
+
+  .brand {
+    padding: 0.42rem 0.72rem;
+  }
+
+  .exhibit-pill {
+    padding: 0.62rem 0.72rem;
+  }
+
+  .exhibit-title {
+    font-size: 0.96rem;
   }
 }
